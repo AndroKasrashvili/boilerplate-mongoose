@@ -1,3 +1,8 @@
+require("custom-env").env();
+
+/** 1) Install & Set up mongoose */
+const mongoose = require( "mongoose");
+
 /**********************************************
 * 3. FCC Mongo & Mongoose Challenges
 * ==================================
@@ -5,15 +10,7 @@
 
 /** # MONGOOSE SETUP #
 /*  ================== */
-
-/** 1) Install & Set up mongoose */
-
-// Add mongodb and mongoose to the project's package.json. Then require 
-// mongoose. Store your Mongo Atlas database URI in the private .env file 
-// as MONGO_URI. Connect to the database using the following syntax:
-//
-// mongoose.connect(<Your URI>, { useNewUrlParser: true, useUnifiedTopology: true }); 
-
+const db = mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true }).catch(()=> {console.log(arguments)});
 
 
 /** # SCHEMAS and MODELS #
@@ -40,8 +37,14 @@
 // `default` values. See the [mongoose docs](http://mongoosejs.com/docs/guide.html).
 
 // <Your code here >
+const Schema = mongoose.Schema;
+const personSchema = new Schema({
+  name: String,
+  age: Number,
+  favoriteFoods: [String]
+});
+const Person = mongoose.model('Person', personSchema);/* = <Your Model> */
 
-var Person /* = <Your Model> */
 
 // **Note**: Glitch is a real server, and in real servers interactions with
 // the db are placed in handler functions, to be called when some event happens
@@ -61,7 +64,6 @@ var Person /* = <Your Model> */
 
 /** # [C]RUD part I - CREATE #
 /*  ========================== */
-
 /** 3) Create and Save a Person */
 
 // Create a `document` instance using the `Person` constructor you build before.
@@ -79,8 +81,16 @@ var Person /* = <Your Model> */
 // });
 
 var createAndSavePerson = function(done) {
-  
-  done(null /*, data*/);
+  let person = new Person({
+    name: 'Andro',
+    age: 25,
+    favoriteFoods: ['1', '2', '3']
+  });
+  person.save((err, data) => {
+    if(err) return done(err);
+    done(null ,data);
+  });
+
 
 };
 
@@ -94,9 +104,11 @@ var createAndSavePerson = function(done) {
 // 'arrayOfPeople'.
 
 var createManyPeople = function(arrayOfPeople, done) {
-    
-    done(null/*, data*/);
-    
+    Person.create(arrayOfPeople,(err, res) => {
+      if(err) return done(err);
+      done(null, res);
+    });
+
 };
 
 /** # C[R]UD part II - READ #
